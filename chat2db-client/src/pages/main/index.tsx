@@ -26,6 +26,7 @@ import Team from './team';
 import Setting from '@/blocks/Setting';
 
 import styles from './index.less';
+import AIChat from '@/blocks/AIChat';
 
 const navConfig: INavItem[] = [
   {
@@ -48,6 +49,13 @@ const navConfig: INavItem[] = [
     iconFontSize: 20,
     isLoad: false,
     component: <Connection />,
+  },
+  {
+    key: 'ai',
+    icon: '\ue622',
+    iconFontSize: 20,
+    isLoad: false,
+    component: <AIChat type={"page"} />,
   },
   {
     key: 'github',

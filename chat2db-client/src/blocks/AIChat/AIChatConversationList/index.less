@@ -1,0 +1,46 @@
+@import '../../../styles/var.less';
+
+.aiChatConversationList {
+  height: 100%;
+  overflow: auto;
+
+  max-width: 480px;
+  min-width: 240px;
+  background-color: var(--color-bg-subtle);
+
+  .title {
+    padding: 0 16px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .flow {
+    padding: 8px 12px 8px 4px;
+
+    .flowItem {
+      line-height: 24px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+      border-radius: 4px;
+      padding: 8px;
+
+      &:hover {
+        cursor: pointer;
+        background-color: var(--color-primary-bg-hover);
+
+      }
+
+      .flowItemIcon {
+        margin-right: 8px;
+        color: var(--color-text-primary);
+        font-size: 16px;
+      }
+    }
+  }
+}
