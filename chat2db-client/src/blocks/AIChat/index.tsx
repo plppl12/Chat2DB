@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './index.less';
-import AIChatConversationList from './AIChatConversationList';
+import AIChatConversationList, { IConversationItem } from './AIChatConversationList';
 import AIChatConversation from './AIChatConversation';
 
 export interface AIChatUsedType {
@@ -17,11 +17,19 @@ interface IAIChatProps {
 
 function AIChat(props: IAIChatProps) {
   const { type } = props;
+
+  const [activeConversation, setActiveConversation] = React.useState<IConversationItem | null>(null);
+
   return (
     <div className={styles.aiChat}>
-      <AIChatConversationList />
+      <AIChatConversationList
+        onClickItem={(item: IConversationItem) => {
+          setActiveConversation(item);
+        }}
+        onClickAddItem={() => {}}
+      />
 
-      <AIChatConversation />
+      <AIChatConversation curItem={activeConversation} />
     </div>
   );
 }

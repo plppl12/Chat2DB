@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import styles from './index.less';
-import { DatabaseTypeCode } from '@/constants';
+import { IConversationItem } from '@/typings/aiConversation';
 import Iconfont from '@/components/Iconfont';
+import { Button } from 'antd';
+import styles from './index.less';
 
-interface IConversationItem {
-  id?: number;
-  title: string;
-  type?: DatabaseTypeCode;
-  dataSourceId?: number;
-  schemaName?: string;
-  databaseName?: string;
-  // 自动、手动同步表结构
-  syncTableStructure?: boolean;
+interface IProps {
+  onClickItem: (item: IConversationItem) => void;
+  onClickAddItem: () => void;
 }
 
-function AIChatConversationList() {
+function AIChatConversationList(props: IProps) {
   const [conversationList, setConversationList] = useState<IConversationItem[]>([]);
 
   useEffect(() => {
@@ -22,23 +17,29 @@ function AIChatConversationList() {
       {
         id: 1,
         title: '测试数据库1',
-        type: DatabaseTypeCode.MYSQL,
-        dataSourceId: 2,
-        databaseName: 'ali_dbhub_test',
       },
       {
         id: 2,
         title: '测试数据库2',
-        type: DatabaseTypeCode.MYSQL,
-        dataSourceId: 2,
-        databaseName: 'sql_hr',
       },
     ]);
   }, []);
 
   return (
     <div className={styles.aiChatConversationList}>
-      <div className={styles.title}>AI聊天列表</div>
+      <div className={styles.title}>
+        历史记录
+        <Button
+          type="primary"
+          size="middle"
+          style={{ padding: '3px 8px' }}
+          onClick={() => {
+            props.onClickAddItem && props.onClickAddItem();
+          }}
+        >
+          <Iconfont code="&#xe61b;" size={12} />
+        </Button>
+      </div>
 
       <div className={styles.flow}>
         {(conversationList || [])?.map((item) => (
