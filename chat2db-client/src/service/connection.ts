@@ -42,14 +42,17 @@ const remove = createRequest<{ id: number }, void>('/api/connection/datasource/:
 
 const clone = createRequest<{ id: number }, void>('/api/connection/datasource/clone', { method: 'post' });
 
-const getDBList = createRequest<{ dataSourceId: number; refresh?: boolean }, any>('/api/rdb/database/list', {
+const getDBList = createRequest<
+  { dataSourceId: number; refresh?: boolean },
+  Array<{ name: string; description: string; count: number }>
+>('/api/rdb/database/list', {
   method: 'get',
 });
 
-const getSchemaList = createRequest<{ dataSourceId: number; databaseName: string; refresh?: boolean }, any>(
-  '/api/rdb/schema/list',
-  { method: 'get' },
-);
+const getSchemaList = createRequest<
+  { dataSourceId: number; databaseName: string; refresh?: boolean },
+  Array<{ name: string }>
+>('/api/rdb/schema/list', { method: 'get' });
 
 export interface IDriverResponse {
   driverConfigList: {

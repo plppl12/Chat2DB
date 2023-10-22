@@ -2,6 +2,7 @@ import { DatabaseTypeCode } from '@/constants';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { addIntelliSenseField } from './field';
 import i18n from '@/i18n';
+import { compatibleDataBaseName } from '../database';
 
 /** 当前库下的表 */
 let intelliSenseTable = monaco.languages.registerCompletionItemProvider('sql', {
@@ -14,19 +15,7 @@ let intelliSenseTable = monaco.languages.registerCompletionItemProvider('sql', {
 
 /** 根据不同的数据库，插入不同的表名  */
 const handleInsertText = (text: string, databaseCode: DatabaseTypeCode = DatabaseTypeCode.MYSQL) => {
-  if (
-    [DatabaseTypeCode.POSTGRESQL, DatabaseTypeCode.ORACLE, DatabaseTypeCode.DB2, DatabaseTypeCode.SQLITE].includes(
-      databaseCode,
-    )
-  ) {
-    return `\"${text}\"`;
-  } else if ([DatabaseTypeCode.SQLSERVER].includes(databaseCode)) {
-    return `[${text}]`;
-  } else if ([DatabaseTypeCode.MYSQL].includes(databaseCode)) {
-    return `\`${text}\``;
-  } else {
-    return `${text}`;
-  }
+  return compatibleDataBaseName(text, databaseCode);
 };
 
 function checkTableContext(text) {

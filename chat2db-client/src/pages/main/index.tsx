@@ -52,8 +52,8 @@ const navConfig: INavItem[] = [
   },
   {
     key: 'ai',
-    icon: '\ue622',
-    iconFontSize: 20,
+    icon: '\ue70e',
+    iconFontSize: 28,
     isLoad: false,
     component: <AIChat type={"page"} />,
   },
