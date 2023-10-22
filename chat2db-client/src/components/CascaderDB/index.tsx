@@ -5,7 +5,6 @@ import cs from 'classnames';
 import styles from './index.less';
 import Iconfont from '../Iconfont';
 import { databaseMap } from '@/constants/database';
-import { set } from 'lodash';
 
 interface IProps {
   className?: string;
@@ -38,9 +37,6 @@ function CascaderDB(props: IProps) {
   useEffect(() => {
     loadDatabase();
   }, [curDataSourceId]);
-  useEffect(() => {
-    loadSchema();
-  }, [curDatabaseName]);
 
   const handleChangeDataSource = (value) => {
     setCurDataSourceId(value);
@@ -134,9 +130,8 @@ function CascaderDB(props: IProps) {
       }));
 
       setDatabaseOptions(formattedData);
-      if (!curDatabaseName) {
-        setCurDatabaseName(formattedData[0]?.value);
-      }
+      setCurDatabaseName(formattedData[0]?.value);
+      loadSchema(formattedData[0]?.value);
     } catch (error) {
       console.log('get databaseList error', error);
     } finally {
@@ -144,15 +139,15 @@ function CascaderDB(props: IProps) {
     }
   };
 
-  const loadSchema = async () => {
-    if (curDataSourceId === undefined || !curDatabaseName) {
+  const loadSchema = async (databaseName: string) => {
+    if (curDataSourceId === undefined) {
       return;
     }
     setIsSchemaLoading(true);
     try {
       const schemaList = await connection.getSchemaList({
         dataSourceId: curDataSourceId,
-        databaseName: curDatabaseName,
+        databaseName,
         refresh: false,
       });
 
@@ -204,9 +199,7 @@ function CascaderDB(props: IProps) {
       </Spin>
 
       <Spin spinning={isDatabaseLoading}>
-        {isDatabaseLoading ? (
-          <div style={{ width: '100px' }} />
-        ) : (
+        {!!databaseOptions.length && (
           <Select
             bordered={false}
             placeholder="请选择数据库"
@@ -227,6 +220,7 @@ function CascaderDB(props: IProps) {
             )}
           />
         )}
+        {isDatabaseLoading && <div style={{ width: '100px' }} />}
       </Spin>
 
       <Spin spinning={isSchemaLoading}>

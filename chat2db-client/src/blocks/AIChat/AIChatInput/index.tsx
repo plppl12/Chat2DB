@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cs from 'classnames';
 import styles from './index.less';
-import { Cascader, Input } from 'antd';
+import { Cascader, Input, Tooltip } from 'antd';
 import Iconfont from '@/components/Iconfont';
 import CascaderDB from '@/components/CascaderDB';
 
@@ -16,12 +16,8 @@ function AiChatInput(props: IProps) {
     <div className={cs(styles.aiChatInput, className)}>
       <div className={styles.inputTools}>
         <CascaderDB
-          // showSearch
-          className={styles.cascaderDB}
-          bordered={false}
-          placeholder="请选择"
           onChange={(v) => {
-            console.log('v', v);
+            console.log(v);
           }}
         />
       </div>
