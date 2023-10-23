@@ -1,23 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import cs from 'classnames';
-import styles from './index.less';
-import { Cascader, Input, Tooltip } from 'antd';
+import { Input } from 'antd';
 import Iconfont from '@/components/Iconfont';
 import CascaderDB from '@/components/CascaderDB';
+import MyTooltip from '@/components/MyTooltip';
+import styles from './index.less';
+import { IDBInfo } from '../AIChatConversation';
 
 interface IProps {
   className?: string;
+  onSendMessage?: (question: string, dialogContent: IDBInfo) => void;
+  inputStatus: 'chat' | 'loading' | 'streaming';
 }
 
 function AiChatInput(props: IProps) {
   const { className } = props;
+  const [inputValue, setInputValue] = useState<string>('');
+  const databaseInfo = useRef<IDBInfo>({});
+
+  const handleKeyDown = (e) => {
+    if (e.keyCode === 13 && e.metaKey) {
+      handleSendMessage();
+    }
+  };
+
+  const handleSendMessage = () => {
+    console.log('发送消息');
+    props.onSendMessage && props.onSendMessage(inputValue, databaseInfo.current);
+  };
 
   return (
     <div className={cs(styles.aiChatInput, className)}>
       <div className={styles.inputTools}>
         <CascaderDB
           onChange={(v) => {
-            console.log(v);
+            databaseInfo.current = v;
           }}
         />
       </div>
@@ -30,8 +47,15 @@ function AiChatInput(props: IProps) {
             minRows: 1,
             maxRows: 4,
           }}
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+          }}
+          onKeyDown={handleKeyDown}
         />
-        <Iconfont code="&#x100bd;" className={styles.sendBtn} />
+        <MyTooltip title="Cmd+Enter">
+          <Iconfont onClick={handleSendMessage} code="&#x100bd;" className={styles.sendBtn} />
+        </MyTooltip>
       </div>
     </div>
   );

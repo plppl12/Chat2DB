@@ -72,6 +72,10 @@ function CascaderDB(props: IProps) {
       props.onChange({ dataSourceId: curDataSourceId!, databaseName: curDatabaseName, schemaName: value });
   };
 
+  const handleOnChange = (dataSourceId: number, databaseName: string, schemaName: string) => {
+    props.onChange && props.onChange({ dataSourceId, databaseName, schemaName });
+  };
+
   /** 加载DataSource数据 */
   const loadDataSource = async () => {
     // 请求 dataSource 数据
@@ -97,6 +101,7 @@ function CascaderDB(props: IProps) {
 
       if (curDataSourceId === undefined) {
         setCurDataSourceId(formattedData[0]?.value);
+        handleOnChange(formattedData[0]?.value, '', '');
       }
     } catch (error) {
       console.error('get dataSourceList error', error);
@@ -130,8 +135,11 @@ function CascaderDB(props: IProps) {
       }));
 
       setDatabaseOptions(formattedData);
-      setCurDatabaseName(formattedData[0]?.value);
       loadSchema(formattedData[0]?.value);
+      if (!curDatabaseName && formattedData[0]?.value) {
+        setCurDatabaseName(formattedData[0]?.value);
+        handleOnChange(curDataSourceId, formattedData[0]?.value, '');
+      }
     } catch (error) {
       console.log('get databaseList error', error);
     } finally {
@@ -164,8 +172,9 @@ function CascaderDB(props: IProps) {
       }));
 
       setSchemaOptions(formattedData);
-      if (!curSchemeName) {
+      if (!curSchemeName && formattedData[0]?.value) {
         setCurSchemeName(formattedData[0]?.value);
+        handleOnChange(curDataSourceId, databaseName, formattedData[0]?.value);
       }
     } catch (error) {
       console.log('get schemaList error', error);

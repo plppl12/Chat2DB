@@ -2,6 +2,8 @@ import React from 'react';
 import styles from './index.less';
 import AIChatConversationList, { IConversationItem } from './AIChatConversationList';
 import AIChatConversation from './AIChatConversation';
+import { connect } from 'umi';
+import { IAIState } from '@/models/ai';
 
 export interface AIChatUsedType {
   /** 页面使用 */
@@ -13,10 +15,12 @@ export interface AIChatUsedType {
 interface IAIChatProps {
   /** 被使用形式 */
   type: AIChatUsedType;
+
+  aiModel: IAIState;
 }
 
 function AIChat(props: IAIChatProps) {
-  const { type } = props;
+  const { type, aiModel } = props;
 
   const [activeConversation, setActiveConversation] = React.useState<IConversationItem | null>(null);
 
@@ -29,9 +33,13 @@ function AIChat(props: IAIChatProps) {
         onClickAddItem={() => {}}
       />
 
-      <AIChatConversation curItem={activeConversation} />
+      <AIChatConversation aiModel={props.aiModel} curItem={activeConversation} />
     </div>
   );
 }
 
-export default AIChat;
+const dvaModel = connect(({ ai }: { ai: IAIState }) => ({
+  aiModal: ai,
+}));
+
+export default dvaModel(AIChat);
