@@ -7,7 +7,7 @@ export enum IPromptType {
 }
 
 export interface IConversationItem {
-  id?: number;
+  id: number;
   title: string;
   isActive?: boolean;
   // 自动、手动同步表结构
