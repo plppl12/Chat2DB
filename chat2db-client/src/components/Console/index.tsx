@@ -133,8 +133,6 @@ function Console(props: IProps, ref: ForwardedRef<IConsoleRef>) {
     editorRef: editorRef?.current,
   }));
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     if (source !== 'workspace') {
       return;
@@ -151,20 +149,20 @@ function Console(props: IProps, ref: ForwardedRef<IConsoleRef>) {
     } else {
       // 活跃时自动保存
       indexedDB
-      .getDataByCursor('chat2db', 'workspaceConsoleDDL', {
-        consoleId: executeParams.consoleId!,
-        userId: getCookie('CHAT2DB.USER_ID'),
-      })
-      .then((res: any) => {
-        const value = defaultValue || res?.[0]?.ddl || '';
-        const oldValue = editorRef?.current?.getAllContent();
-        if(value !== oldValue){
-          editorRef?.current?.setValue(value, 'reset');
-        }
-        setTimeout(() => {
-          timingAutoSave();
-        }, 0);
-      });
+        .getDataByCursor('chat2db', 'workspaceConsoleDDL', {
+          consoleId: executeParams.consoleId!,
+          userId: getCookie('CHAT2DB.USER_ID'),
+        })
+        .then((res: any) => {
+          const value = defaultValue || res?.[0]?.ddl || '';
+          const oldValue = editorRef?.current?.getAllContent();
+          if (value !== oldValue) {
+            editorRef?.current?.setValue(value, 'reset');
+          }
+          setTimeout(() => {
+            timingAutoSave();
+          }, 0);
+        });
     }
     return () => {
       if (timerRef.current) {
@@ -173,22 +171,25 @@ function Console(props: IProps, ref: ForwardedRef<IConsoleRef>) {
     };
   }, [isActive]);
 
-  function timingAutoSave() {
+  function timingAutoSave(status?: ConsoleStatus) {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     timerRef.current = setInterval(() => {
-      if(executeParams.status === ConsoleStatus.RELEASE){
+      if (executeParams.status === ConsoleStatus.RELEASE || status === ConsoleStatus.RELEASE) {
         const p: any = {
           id: executeParams.consoleId,
           ddl: editorRef?.current?.getAllContent(),
         };
-        historyServer.updateSavedConsole(p)
-      }else{
+        historyServer.updateSavedConsole(p);
+      } else {
         indexedDB.updateData('chat2db', 'workspaceConsoleDDL', {
           consoleId: executeParams.consoleId!,
           ddl: editorRef?.current?.getAllContent(),
           userId: getCookie('CHAT2DB.USER_ID'),
         });
       }
-    }, 2000);
+    }, 5000);
   }
 
   const tableListName = useMemo(() => {
@@ -388,6 +389,7 @@ function Console(props: IProps, ref: ForwardedRef<IConsoleRef>) {
       indexedDB.deleteData('chat2db', 'workspaceConsoleDDL', executeParams.consoleId!);
       message.success(i18n('common.tips.saveSuccessfully'));
       props.onConsoleSave && props.onConsoleSave();
+      timingAutoSave(ConsoleStatus.RELEASE);
     });
   };
 
@@ -455,10 +457,10 @@ function Console(props: IProps, ref: ForwardedRef<IConsoleRef>) {
   };
 
   const handleSelectTableSyncModel = () => {
-    const syncModel: SyncModelType | null = Number(localStorage.getItem('syncTableModel')) ?? null;
+    const syncModel = localStorage.getItem('syncTableModel');
     const hasAiAccess = aiModel.hasWhite;
     if (syncModel !== null) {
-      setSyncTableModel(syncModel);
+      setSyncTableModel(Number(syncModel));
       return;
     }
 
