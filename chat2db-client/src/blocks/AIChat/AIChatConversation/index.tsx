@@ -14,7 +14,7 @@ import { Popover } from 'antd';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import cs from 'classnames';
-import 'highlight.js/styles/github-dark.css'
+import 'highlight.js/styles/github-dark.css';
 
 export interface IDBInfo {
   dataSourceId: number;
@@ -110,12 +110,26 @@ function MyDialog() {
 }
 
 export default MyDialog;
-
-
 \`\`\`
 
           `,
           promptType: IPromptType.NL_2_SQL,
+        },
+        {
+          dataSourceId: 2,
+          databaseName: 'test111',
+          schemaName: 'test',
+          tableName: ['table1', 'table2', 'table3'],
+          question: 'tsasdtsasdftsasdftsasdftsasdftsasdftsasdtsasdftsasdftsasdftsasdftsasdfff',
+          answer: `
+CREATE TABLE \`products1\` (
+  \`product_id\` int NOT NULL,
+  \`name\` varchar(50) DEFAULT NULL,
+  \`price\` decimal(10,2) DEFAULT NULL,
+  \`quantity\` int DEFAULT NULL,
+  PRIMARY KEY (\`product_id\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf          
+          `,
         },
       ]);
     }

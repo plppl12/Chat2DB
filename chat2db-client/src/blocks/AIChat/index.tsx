@@ -23,30 +23,24 @@ interface IAIChatProps {
 
 function AIChat(props: IAIChatProps) {
   const [activeConversationId, setActiveConversationId] = React.useState<number>();
-  // console.log('props', props);
 
+  /** 代码块复制 */
   const codeBlockCopyEvent = useRef((e: Event) => {
     const target: HTMLElement = e.target as HTMLElement;
 
     const isCopyActionClassName = target.className === 'copy-action';
     const isCodeBlockParent = target.parentElement?.parentElement?.className === 'code-block-wrapper';
 
-    // check is copy action button
     if (!(isCopyActionClassName && isCodeBlockParent)) {
       return;
     }
 
-    // got codes
     const content = target?.parentNode?.parentNode?.querySelector('code')?.innerText ?? '';
 
-    // do copy
-    // * thats lines copy from copy block content action
     navigator.clipboard.writeText(content);
     message.success('复制成功');
-    // store.addToast(t('copied to clipboard'));
   });
 
-  // bind code block copy event on mounted
   useEffect(() => {
     document.addEventListener('click', codeBlockCopyEvent.current);
 

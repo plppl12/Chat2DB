@@ -81,6 +81,7 @@
     // code block
     .code-block-wrapper {
       width: 100%;
+      border-radius: 8px;
     }
 
     .code-header {
@@ -90,6 +91,9 @@
       font-size: 12px;
       display: flex;
       justify-content: space-between;
+      height: 32px;
+      align-items: center;
+      border-radius: 8px 8px 0 0; /* top-left, top-right, bottom-right, bottom-left */
     }
 
     .code-block {
@@ -98,6 +102,7 @@
       max-width: 100%;
       overflow: auto;
       margin: 0;
+      border-radius: 0 0 8px 8px;
     }
 
     .rendering .code-block-wrapper div.copy-action {
@@ -113,15 +118,18 @@
       margin-right: 6px;
       cursor: pointer;
       display: inline-block;
+
     }
 
     .code-block-wrapper div.copy-action {
-      background-color: rgba(144, 202, 249, 0.16);
+      background-color: rgba(144, 202, 249, 0.02);
       padding: 2px;
+      border-radius: 4px;
     }
 
     .code-block-wrapper div.copy-action:hover {
-      background-color: rgba(144, 202, 249, 0.36);
+      background-color: rgba(144, 202, 249, 0.15);
+
     }
 
     .code-block-wrapper:hover div.copy-action {
