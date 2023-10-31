@@ -1,0 +1,90 @@
+name: Sync Fork
+on:
+  schedule:
+    - cron: '0 0/2 * * *' # every 2 hours
+  workflow_dispatch: # on button click  
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: sync_main
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: main
+          head: main
+          retries: 3
+          retry_after: 10
+      - name: sync_dev
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: dev
+          head: dev
+          retries: 3
+          retry_after: 10
+      - name: sync_release_test
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: release_test
+          head: release_test
+          retries: 3
+          retry_after: 10
+      - name: sync_release_test_2
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: release_test_2
+          head: release_test_2
+          retries: 3
+          retry_after: 10
+      - name: sync_developing
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: developing
+          head: developing
+          retries: 3
+          retry_after: 10          
+      - name: sync_ai-chat
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: ai-chat
+          head: ai-chat
+          retries: 3
+          retry_after: 10
+      - name: sync_export_ddl
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: export_ddl
+          head: export_ddl
+          retries: 3
+          retry_after: 10
+      - name: sync_database-table-editor
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: database-table-editor
+          head: database-table-editor
+          retries: 3
+          retry_after: 10
+      - name: sync_team
+        uses: tgymnich/fork-sync@v1.9.0
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          owner: chat2db
+          base: team
+          head: team
+          retries: 3
+          retry_after: 10
