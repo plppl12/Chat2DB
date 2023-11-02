@@ -7,7 +7,7 @@ import { ConsoleOpenedStatus, ConsoleStatus, TreeNodeType, WorkspaceTabType, wor
 import historyService from '@/service/history';
 import sqlService from '@/service/sql';
 import Tabs, { ITabItem } from '@/components/Tabs';
-// import WorkspaceExtend from '../WorkspaceExtend';
+import WorkspaceExtend from '../WorkspaceExtend';
 import SearchResult from '@/components/SearchResult';
 import Iconfont from '@/components/Iconfont';
 import LoadingContent from '@/components/Loading/LoadingContent';
@@ -311,7 +311,6 @@ const WorkspaceRight = memo<IProps>((props: IProps) => {
     }
 
     if (doubleClickTreeNodeData.treeNodeType === TreeNodeType.TABLE) {
-
       const { extraParams } = doubleClickTreeNodeData;
       const { tableName } = extraParams || {};
       const sql = `SELECT * FROM ${compatibleDataBaseName(tableName!, curWorkspaceParams.databaseType)};\n`;
@@ -321,25 +320,24 @@ const WorkspaceRight = memo<IProps>((props: IProps) => {
       workspaceTabList.forEach((t) => {
         if (t.uniqueData?.sql === sql) {
           setActiveConsoleId(t.id);
-          flag = true
+          flag = true;
           return;
         }
-      })
-      if(flag){
-        return
-      }
-      setWorkspaceTabList([
-        ...(workspaceTabList || []),
-        {
-          id,
-          title,
-          type: WorkspaceTabType.EditTableData,
-          uniqueData: {
-            sql,
+      });
+      if (!flag) {
+        setWorkspaceTabList([
+          ...(workspaceTabList || []),
+          {
+            id,
+            title,
+            type: WorkspaceTabType.EditTableData,
+            uniqueData: {
+              sql,
+            },
           },
-        },
-      ]);
-      setActiveConsoleId(id);
+        ]);
+        setActiveConsoleId(id);
+      }
     }
 
     dispatch({
@@ -620,10 +618,9 @@ const WorkspaceRight = memo<IProps>((props: IProps) => {
             activeKey={activeConsoleId}
             editableNameOnBlur={editableNameOnBlur}
             items={tabsList}
-            // lastTabCannotClosed
           />
         </div>
-        {/* <WorkspaceExtend className={styles.workspaceExtend} /> */}
+        <WorkspaceExtend curWorkspaceParams={curWorkspaceParams} className={styles.workspaceExtend} />
       </LoadingContent>
     </div>
   );
