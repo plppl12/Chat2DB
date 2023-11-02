@@ -9,15 +9,15 @@ import miscService from '@/service/misc';
 import antdEnUS from 'antd/locale/en_US';
 import antdZhCN from 'antd/locale/zh_CN';
 import { useTheme } from '@/hooks';
-import { ThemeType, LangType } from '@/constants/';
+import { ThemeType, LangType, PrimaryColorType } from '@/constants/';
 import styles from './index.less';
 import { getLang, setLang } from '@/utils/localStorage';
 import { clearOlderLocalStorage } from '@/utils';
 import registerMessage from './init/registerMessage';
 import registerNotification from './init/registerNotification';
 import MyNotification from '@/components/MyNotification';
-import Iconfont from '@/components/Iconfont';
-import Setting from '@/blocks/Setting';
+// import Iconfont from '@/components/Iconfont';
+// import Setting from '@/blocks/Setting';
 import indexedDB from '@/indexedDB';
 
 declare global {
@@ -33,8 +33,8 @@ declare global {
     electronApi?: {
       startServerForSpawn: () => void;
       quitApp: () => void;
-      setBaseURL: (baseUrl:string) => void;
-      registerAppMenu: (data:any) => void;
+      setBaseURL: (baseUrl: string) => void;
+      registerAppMenu: (data: any) => void;
     };
   }
   const __APP_VERSION__: string;
@@ -55,9 +55,13 @@ window._Lang = getLang();
 
 const { useToken } = theme;
 
-export const colorSchemeListeners: { [key: string]: () => void } = {};
+export const colorSchemeListeners: {
+  [key: string]: (theme: { backgroundColor: ThemeType; primaryColor: PrimaryColorType }) => void;
+} = {};
 
-export function addColorSchemeListener(callback: () => void) {
+export function addColorSchemeListener(
+  callback: (theme: { backgroundColor: ThemeType; primaryColor: PrimaryColorType }) => void,
+) {
   const uuid = uuidv4();
   colorSchemeListeners[uuid] = callback;
   return uuid;
@@ -82,7 +86,6 @@ export default function Layout() {
 const restartCount = 200;
 
 function AppContainer() {
-  const { token } = useToken();
   const [initEnd, setInitEnd] = useState(false);
   const [appTheme, setAppTheme] = useTheme();
   const [startSchedule, setStartSchedule] = useState(0); // 0 初始状态 1 服务启动中 2 启动成功
@@ -91,10 +94,6 @@ function AppContainer() {
   useLayoutEffect(() => {
     collectInitApp();
   }, []);
-
-  useEffect(() => {
-    injectThemeVar(token as any, appTheme.backgroundColor, appTheme.primaryColor);
-  }, [token]);
 
   // 初始化app
   function collectInitApp() {
@@ -109,9 +108,9 @@ function AppContainer() {
   function registerElectronApi() {
     window.electronApi?.registerAppMenu({
       version: __APP_VERSION__,
-    })
+    });
     // 把关闭java服务的的方法传给electron
-    window.electronApi?.setBaseURL?.(window._BaseURL)
+    window.electronApi?.setBaseURL?.(window._BaseURL);
     // console.log(window.electronApi)
   }
 
@@ -186,7 +185,7 @@ function AppContainer() {
             <div className={styles.loadingBox}>
               <Spin spinning={!serviceFail} size="large" />
               {/* 状态等于1时，说明没服务起来需要轮训接口，这时可能服务配置又问题，需要设置来修改 */}
-              {startSchedule === 1 && (
+              {/* {startSchedule === 1 && (
                 <Setting
                   render={
                     <div className={styles.settingBox}>
@@ -195,7 +194,7 @@ function AppContainer() {
                   }
                   noLogin
                 />
-              )}
+              )} */}
               {serviceFail && (
                 <>
                   <div className={styles.github}>
