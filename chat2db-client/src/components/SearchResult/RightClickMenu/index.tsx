@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Dropdown } from 'antd';
 import i18n from '@/i18n';
 import MenuLabel from '@/components/MenuLabel';
@@ -6,57 +6,93 @@ import MenuLabel from '@/components/MenuLabel';
 interface IProps {
   className?: string;
   children?: React.ReactNode;
+  menuList: IMenu[]
+}
+
+export interface IMenu {
+  key: string;
+  callback?: () => void;
+  children?: {
+    callback: () => void;
+    hide?: boolean;
+  }[]
+}
+
+export enum AllSupportedMenusType  {
+  CopyCell = 'copy-cell',
+  CopyRow = 'copy-row',
+  CloneRow = 'clone-row',
+  DeleteRow = 'delete-row',
+  SetDefault = 'set-default',
+  SetNull = 'set-null',
 }
 
 export default memo<IProps>((props) => {
-  const { children } = props;
-  const items = [
-    {
-      label: <MenuLabel icon="&#xec7a;" label="拷贝" />,
-      key: '0',
+  const { children, menuList } = props;
+  const allSupportedMenus = {
+    [AllSupportedMenusType.CopyCell]: {
+      label: <MenuLabel icon="&#xec7a;" label={i18n('common.button.copy')} />,
+      key: AllSupportedMenusType.CopyCell,
     },
-    {
-      label: <MenuLabel icon="&#xec7a;" label="拷贝行" />,
-      key: '1',
+    [AllSupportedMenusType.CopyRow]: {
+      label: <MenuLabel icon="&#xec7a;" label={i18n('common.button.copyRowAs')} />,
+      key: AllSupportedMenusType.CopyRow,
       children: [
         {
-          label: 'Insert 语句',
-          key: '1-1',
-          onClick: () => {},
+          label: i18n('common.button.insertSql'),
+          key: 'copy-row-1',
         },
         {
-          label: 'Update 语句',
-          key: '1-2',
-          onClick: () => {},
+          label: i18n('common.button.updateSql'),
+          key: 'copy-row-2',
         },
         {
-          label: '制表符分隔值(数据)',
-          key: '1-3',
-          onClick: () => {},
+          label: i18n('common.button.tabularSeparatedValues'),
+          key: 'copy-row-3',
         },
         {
-          label: '制表符分隔值(字段名)',
-          key: '1-4',
-          onClick: () => {},
+          label: i18n('common.button.tabularSeparatedValuesFieldName'),
+          key: 'copy-row-4',
         },
         {
-          label: '制表符分隔值(字段名和数据)',
-          key: '1-5',
-          onClick: () => {},
+          label: i18n('common.button.tabularSeparatedValuesFieldNameAndData'),
+          key: 'copy-row-5',
         },
       ]
     },
-    {
-      label: <MenuLabel icon="&#xec7a;" label="克隆行" />,
-      key: '2',
-      onClick: () => {},
+    [AllSupportedMenusType.CloneRow]: {
+      label: <MenuLabel icon="&#xe8db;" label={i18n('common.button.cloneRow')} />,
+      key: AllSupportedMenusType.CloneRow,
     },
-    {
-      label: <MenuLabel icon="&#xe6a7;" label="删除行" />,
-      key: '3',
-      onClick: () => {},
+    [AllSupportedMenusType.DeleteRow]: {
+      label: <MenuLabel icon="&#xe6a7;" label={i18n('common.button.deleteRow')} />,
+      key: AllSupportedMenusType.DeleteRow,
     },
-  ]
+    [AllSupportedMenusType.SetDefault]: {
+      label: <MenuLabel label={i18n('common.button.setDefault')} />,
+      key: AllSupportedMenusType.SetDefault,
+    },
+    [AllSupportedMenusType.SetNull]: {
+      label: <MenuLabel label={i18n('common.button.setNull')} />,
+      key: AllSupportedMenusType.SetNull,
+    },
+  }
+
+  const items = useMemo(()=>{
+    return menuList.map((menu) => {
+      return {
+        ...allSupportedMenus[menu.key],
+        onClick: menu.callback,
+        children: menu.children?.map((child,index) => {
+          if (child.hide) return null;
+          return {
+            ...allSupportedMenus[menu.key]['children'][index],
+            onClick: child.callback,
+          }
+        })
+      }
+    })
+  }, [menuList])
 
   return <Dropdown menu={{ items }} trigger={["contextMenu"]} >
     {children}
