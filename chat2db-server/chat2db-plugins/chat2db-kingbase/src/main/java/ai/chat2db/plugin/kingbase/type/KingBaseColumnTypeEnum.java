@@ -1,4 +1,4 @@
-package ai.chat2db.plugin.postgresql.type;
+package ai.chat2db.plugin.kingbase.type;
 
 import ai.chat2db.spi.ColumnBuilder;
 import ai.chat2db.spi.enums.EditStatus;
@@ -11,20 +11,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
+public enum KingBaseColumnTypeEnum implements ColumnBuilder {
 
     BIGSERIAL("BIGSERIAL", false, false, true, false, false, false, true, true, false, false),
     BIT("BIT", true, false, true, false, false, false, true, true, false, false),
     BOOL("BOOL", false, false, true, false, false, false, true, true, false, false),
     BOX("BOX", false, false, true, false, false, false, true, true, false, false),
     BYTEA("BYTEA", false, false, true, false, false, false, true, true, false, false),
+
+    CHARACTER("CHARACTER", true, false, true, false, false, true, true, true, false, false),
+
+    CHARACTER_VARYING("CHARACTER VARYING", true, false, true, false, false, true, true, true, false, false),
     CHAR("CHAR", true, false, true, false, false, true, true, true, false, false),
+
+    CID("CID", false, false, true, false, false, false, true, true, false, false),
     CIDR("CIDR", false, false, true, false, false, false, true, true, false, false),
+
     CIRCLE("CIRCLE", false, false, true, false, false, false, true, true, false, false),
+
+    CLOB("CLOB", false, false, true, false, false, false, true, true, false, false),
     DATE("DATE", false, false, true, false, false, false, true, true, false, false),
     DECIMAL("DECIMAL", true, false, true, false, false, false, true, true, false, false),
     FLOAT4("FLOAT4", false, false, true, false, false, false, true, true, false, false),
     FLOAT8("FLOAT8", false, false, true, false, false, false, true, true, false, false),
+
+    INTEGER("INTEGER", false, false, true, false, false, false, true, true, false, false),
     INET("INET", false, false, true, false, false, false, true, true, false, false),
     INT2("INT2", false, false, true, false, false, false, true, true, false, false),
     INT4("INT4", false, false, true, false, false, false, true, true, false, false),
@@ -60,10 +71,10 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
 
     ;
 
-    private static Map<String, PostgreSQLColumnTypeEnum> COLUMN_TYPE_MAP = Maps.newHashMap();
+    private static Map<String, KingBaseColumnTypeEnum> COLUMN_TYPE_MAP = Maps.newHashMap();
 
     static {
-        for (PostgreSQLColumnTypeEnum value : PostgreSQLColumnTypeEnum.values()) {
+        for (KingBaseColumnTypeEnum value : KingBaseColumnTypeEnum.values()) {
             COLUMN_TYPE_MAP.put(value.getColumnType().getTypeName(), value);
         }
     }
@@ -71,16 +82,16 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
     private ColumnType columnType;
 
 
-    PostgreSQLColumnTypeEnum(String dataTypeName, boolean supportLength, boolean supportScale, boolean supportNullable, boolean supportAutoIncrement, boolean supportCharset, boolean supportCollation, boolean supportComments, boolean supportDefaultValue, boolean supportExtent, boolean supportValue) {
+    KingBaseColumnTypeEnum(String dataTypeName, boolean supportLength, boolean supportScale, boolean supportNullable, boolean supportAutoIncrement, boolean supportCharset, boolean supportCollation, boolean supportComments, boolean supportDefaultValue, boolean supportExtent, boolean supportValue) {
         this.columnType = new ColumnType(dataTypeName, supportLength, supportScale, supportNullable, supportAutoIncrement, supportCharset, supportCollation, supportComments, supportDefaultValue, supportExtent, supportValue, false);
     }
 
-    public static PostgreSQLColumnTypeEnum getByType(String dataType) {
+    public static KingBaseColumnTypeEnum getByType(String dataType) {
         return COLUMN_TYPE_MAP.get(dataType.toUpperCase());
     }
 
     public static List<ColumnType> getTypes() {
-        return Arrays.stream(PostgreSQLColumnTypeEnum.values()).map(columnTypeEnum ->
+        return Arrays.stream(KingBaseColumnTypeEnum.values()).map(columnTypeEnum ->
                 columnTypeEnum.getColumnType()
         ).toList();
     }
@@ -91,7 +102,7 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
 
     @Override
     public String buildCreateColumnSql(TableColumn column) {
-        PostgreSQLColumnTypeEnum type = COLUMN_TYPE_MAP.get(column.getColumnType().toUpperCase());
+        KingBaseColumnTypeEnum type = COLUMN_TYPE_MAP.get(column.getColumnType().toUpperCase());
         if (type == null) {
             return "";
         }
@@ -111,7 +122,7 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
         return script.toString();
     }
 
-    private String buildCollation(TableColumn column, PostgreSQLColumnTypeEnum type) {
+    private String buildCollation(TableColumn column, KingBaseColumnTypeEnum type) {
         if (!type.getColumnType().isSupportCollation() || StringUtils.isEmpty(column.getCollationName())) {
             return "";
         }
@@ -146,7 +157,7 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
         return "";
     }
 
-    public String buildComment(TableColumn column, PostgreSQLColumnTypeEnum type) {
+    public String buildComment(TableColumn column, KingBaseColumnTypeEnum type) {
         if (!this.columnType.isSupportComments() || column.getComment() == null
                 || EditStatus.DELETE.name().equals(column.getEditStatus())) {
             return "";
@@ -155,7 +166,7 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
                 "\".\"", column.getName(), "\" IS '", column.getComment(), "';");
     }
 
-    private String buildDefaultValue(TableColumn column, PostgreSQLColumnTypeEnum type) {
+    private String buildDefaultValue(TableColumn column, KingBaseColumnTypeEnum type) {
         if (!type.getColumnType().isSupportDefaultValue() || StringUtils.isEmpty(column.getDefaultValue())) {
             return "";
         }
@@ -182,7 +193,7 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
         return StringUtils.join("DEFAULT ", column.getDefaultValue());
     }
 
-    private String buildNullable(TableColumn column, PostgreSQLColumnTypeEnum type) {
+    private String buildNullable(TableColumn column, KingBaseColumnTypeEnum type) {
         if (!type.getColumnType().isSupportNullable()) {
             return "";
         }
@@ -193,9 +204,9 @@ public enum PostgreSQLColumnTypeEnum implements ColumnBuilder {
         }
     }
 
-    private String buildDataType(TableColumn column, PostgreSQLColumnTypeEnum type) {
+    private String buildDataType(TableColumn column, KingBaseColumnTypeEnum type) {
         String columnType = type.columnType.getTypeName();
-        if (Arrays.asList(VARCHAR, CHAR).contains(type)) {
+        if (Arrays.asList(VARCHAR, CHAR,CHARACTER).contains(type)) {
             if (column.getColumnSize() == null ) {
                 return columnType;
             }

@@ -1,12 +1,11 @@
-package ai.chat2db.plugin.postgresql.builder;
+package ai.chat2db.plugin.kingbase.builder;
 
-import ai.chat2db.plugin.postgresql.type.PostgreSQLColumnTypeEnum;
-import ai.chat2db.plugin.postgresql.type.PostgreSQLIndexTypeEnum;
+import ai.chat2db.plugin.kingbase.type.KingBaseColumnTypeEnum;
+import ai.chat2db.plugin.kingbase.type.KingBaseIndexTypeEnum;
 import ai.chat2db.spi.SqlBuilder;
 import ai.chat2db.spi.jdbc.DefaultSqlBuilder;
 import ai.chat2db.spi.model.*;
 import ai.chat2db.spi.util.TableUtils;
-import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilder {
+public class KingBaseSqlBuilder extends DefaultSqlBuilder implements SqlBuilder {
     @Override
     public String buildCreateTableSql(Table table) {
         StringBuilder script = new StringBuilder();
@@ -27,11 +26,11 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
             if (StringUtils.isBlank(column.getName()) || StringUtils.isBlank(column.getColumnType())) {
                 continue;
             }
-            PostgreSQLColumnTypeEnum typeEnum = PostgreSQLColumnTypeEnum.getByType(column.getColumnType());
+            KingBaseColumnTypeEnum typeEnum = KingBaseColumnTypeEnum.getByType(column.getColumnType());
             script.append("\t").append(typeEnum.buildCreateColumnSql(column)).append(",\n");
         }
         Map<Boolean, List<TableIndex>> tableIndexMap = table.getIndexList().stream()
-                .collect(Collectors.partitioningBy(v -> PostgreSQLIndexTypeEnum.NORMAL.getName().equals(v.getType())));
+                .collect(Collectors.partitioningBy(v -> KingBaseIndexTypeEnum.NORMAL.getName().equals(v.getType())));
         // append constraint key
         List<TableIndex> constraintList = tableIndexMap.get(Boolean.FALSE);
         if (CollectionUtils.isNotEmpty(constraintList)) {
@@ -39,15 +38,19 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
                 if (StringUtils.isBlank(index.getName()) || StringUtils.isBlank(index.getType())) {
                     continue;
                 }
-                PostgreSQLIndexTypeEnum indexTypeEnum = PostgreSQLIndexTypeEnum.getByType(index.getType());
+                KingBaseIndexTypeEnum indexTypeEnum = KingBaseIndexTypeEnum.getByType(index.getType());
                 script.append("\t").append("").append(indexTypeEnum.buildIndexScript(index));
                 script.append(",\n");
             }
 
         }
         script = new StringBuilder(script.substring(0, script.length() - 2));
-        script.append("\n)").append(";");
-
+        script.append("\n)");
+        if(StringUtils.isNotBlank(table.getTablespace())){
+            script.append(" TABLESPACE \"").append(table.getTablespace()).append("\";");
+        }else {
+            script.append(" TABLESPACE \"SYS_DEFAULT\";");
+        }
         // append index
         List<TableIndex> tableIndexList = tableIndexMap.get(Boolean.TRUE);
         for (TableIndex tableIndex : tableIndexList) {
@@ -55,7 +58,7 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
                 continue;
             }
             script.append("\n");
-            PostgreSQLIndexTypeEnum indexTypeEnum = PostgreSQLIndexTypeEnum.getByType(tableIndex.getType());
+            KingBaseIndexTypeEnum indexTypeEnum = KingBaseIndexTypeEnum.getByType(tableIndex.getType());
             script.append("").append(indexTypeEnum.buildIndexScript(tableIndex)).append(";");
         }
 
@@ -67,15 +70,14 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
         }
         List<TableColumn> tableColumnList = table.getColumnList().stream().filter(v -> StringUtils.isNotBlank(v.getComment())).toList();
         for (TableColumn tableColumn : tableColumnList) {
-            PostgreSQLColumnTypeEnum typeEnum = PostgreSQLColumnTypeEnum.getByType(tableColumn.getColumnType());
+            KingBaseColumnTypeEnum typeEnum = KingBaseColumnTypeEnum.getByType(tableColumn.getColumnType());
             script.append(typeEnum.buildComment(tableColumn, typeEnum)).append("\n");
             ;
         }
         List<TableIndex> indexList = table.getIndexList().stream().filter(v -> StringUtils.isNotBlank(v.getComment())).toList();
         for (TableIndex index : indexList) {
-            PostgreSQLIndexTypeEnum indexEnum = PostgreSQLIndexTypeEnum.getByType(index.getType());
+            KingBaseIndexTypeEnum indexEnum = KingBaseIndexTypeEnum.getByType(index.getType());
             script.append(indexEnum.buildIndexComment(index)).append("\n");
-            ;
         }
 
         return script.toString();
@@ -101,13 +103,13 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
         }
 
         Map<Boolean, List<TableIndex>> tableIndexMap = newTable.getIndexList().stream()
-                .collect(Collectors.partitioningBy(v -> PostgreSQLIndexTypeEnum.NORMAL.getName().equals(v.getType())));
+                .collect(Collectors.partitioningBy(v -> KingBaseIndexTypeEnum.NORMAL.getName().equals(v.getType())));
         StringBuilder scriptModify = new StringBuilder();
         Boolean modify = false;
         scriptModify.append("ALTER TABLE ").append("\"").append(newTable.getName()).append("\" \n");
         // append modify column
         for (TableColumn tableColumn : newTable.getColumnList()) {
-            PostgreSQLColumnTypeEnum typeEnum = PostgreSQLColumnTypeEnum.getByType(tableColumn.getColumnType());
+            KingBaseColumnTypeEnum typeEnum = KingBaseColumnTypeEnum.getByType(tableColumn.getColumnType());
             scriptModify.append("\t").append(typeEnum.buildModifyColumn(tableColumn, TableUtils.getTableColumn(oldTable,tableColumn.getOldName()))).append(",\n");
             modify = true;
 
@@ -116,7 +118,7 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
         // append modify constraint
         for (TableIndex tableIndex : tableIndexMap.get(Boolean.FALSE)) {
             if (StringUtils.isNotBlank(tableIndex.getType())) {
-                PostgreSQLIndexTypeEnum indexTypeEnum = PostgreSQLIndexTypeEnum.getByType(tableIndex.getType());
+                KingBaseIndexTypeEnum indexTypeEnum = KingBaseIndexTypeEnum.getByType(tableIndex.getType());
                 scriptModify.append("\t").append(indexTypeEnum.buildModifyIndex(tableIndex)).append(",\n");
                 modify = true;
             }
@@ -131,7 +133,7 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
         // append modify index
         for (TableIndex tableIndex : tableIndexMap.get(Boolean.TRUE)) {
             if (StringUtils.isNotBlank(tableIndex.getEditStatus()) && StringUtils.isNotBlank(tableIndex.getType())) {
-                PostgreSQLIndexTypeEnum indexTypeEnum = PostgreSQLIndexTypeEnum.getByType(tableIndex.getType());
+                KingBaseIndexTypeEnum indexTypeEnum = KingBaseIndexTypeEnum.getByType(tableIndex.getType());
                 script.append(indexTypeEnum.buildModifyIndex(tableIndex)).append(";\n");
             }
         }
@@ -143,13 +145,13 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
                     .append(newTable.getComment()).append("';\n");
         }
         for (TableColumn tableColumn : newTable.getColumnList()) {
-            PostgreSQLColumnTypeEnum typeEnum = PostgreSQLColumnTypeEnum.getByType(tableColumn.getColumnType());
+            KingBaseColumnTypeEnum typeEnum = KingBaseColumnTypeEnum.getByType(tableColumn.getColumnType());
             script.append(typeEnum.buildComment(tableColumn, typeEnum)).append("\n");
             ;
         }
         List<TableIndex> indexList = newTable.getIndexList().stream().filter(v -> StringUtils.isNotBlank(v.getComment())).toList();
         for (TableIndex index : indexList) {
-            PostgreSQLIndexTypeEnum indexEnum = PostgreSQLIndexTypeEnum.getByType(index.getType());
+            KingBaseIndexTypeEnum indexEnum = KingBaseIndexTypeEnum.getByType(index.getType());
             script.append(indexEnum.buildIndexComment(index)).append("\n");
         }
 
@@ -175,17 +177,19 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
     @Override
     public String buildCreateDatabaseSql(Database database) {
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("CREATE DATABASE \""+database.getName()+"\"");
-        sqlBuilder.append("\nWITH ");
-        if(StringUtils.isNotBlank(database.getCharset())){
-            sqlBuilder.append("\n LC_CTYPE = '").append(database.getCharset()).append("' ");
+        sqlBuilder.append("CREATE DATABASE "+database.getName());
+        String owner = database.getOwner();
+        if (StringUtils.isBlank(owner)) {
+            owner = "SYSTEM";
         }
-        if(StringUtils.isNotBlank(database.getCollation())){
-            sqlBuilder.append("\n LC_COLLATE = '").append(database.getCollation()).append("' ");
+        sqlBuilder.append(" WITH  OWNER = \"").append(owner).append("\"");
+        if (StringUtils.isNotBlank(database.getCharset())) {
+            sqlBuilder.append(" ENCODING  ").append(database.getCharset()).append("");
         }
+        sqlBuilder.append(";\n");
 
-        if(StringUtils.isNotBlank(database.getComment())){
-            sqlBuilder.append("; COMMENT ON DATABASE \"").append(database.getName()).append("\" IS '").append(database.getComment()).append("';");
+        if (StringUtils.isNotBlank(database.getComment())) {
+            sqlBuilder.append("COMMENT ON DATABASE ").append(database.getName()).append(" IS '").append(database.getComment()).append("';");
         }
         return sqlBuilder.toString();
     }
@@ -194,13 +198,13 @@ public class PostgreSQLSqlBuilder extends DefaultSqlBuilder implements SqlBuilde
     @Override
     public String buildCreateSchemaSql(Schema schema){
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("CREATE SCHEMA \""+schema.getName()+"\"");
-        if(StringUtils.isNotBlank(schema.getOwner())){
-            sqlBuilder.append(" AUTHORIZATION ").append(schema.getOwner());
+        sqlBuilder.append("CREATE SCHEMA "+schema.getName()+"");
+        String owner = schema.getOwner();
+        if(StringUtils.isBlank(schema.getOwner())){
+            owner = "SYSTEM";
         }
-        if(StringUtils.isNotBlank(schema.getComment())){
-            sqlBuilder.append("; COMMENT ON SCHEMA \"").append(schema.getName()).append("\" IS '").append(schema.getComment()).append("';");
-        }
+        sqlBuilder.append(" AUTHORIZATION \"").append(owner).append("\"");
         return sqlBuilder.toString();
     }
+
 }
