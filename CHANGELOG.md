@@ -1,6 +1,6 @@
 ## 3.0.10
 
-`2023-11-05`
+`2023-11-06`
 
 **Changelog**
 - ⭐【New Features】Add multiple CN AI configurations Add multiple domestic AI configurations
@@ -25,6 +25,7 @@
 - 🐞【Fixed】Fixed table structure editing floating-point decimal Settings display exception
 - 🐞【Fixed】Fixed switching the saved sql on the console will eliminate the problem
 - 🐞【Fixed】After multiple tables are paged, the context cannot select a table other than the current page
+- 🐞【Fixed】Console and resulting Tabs mouse wheel not scrolling
 
 ## 3.0.9
 

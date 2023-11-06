@@ -26,6 +26,7 @@ import sqlService, { IExportParams, IExecuteSqlParams } from '@/service/sql';
 
 // store
 import { useCommonStore } from '@/store/common';
+import { useWorkspaceStore } from '@/store/workspace';
 
 // 依赖组件
 import ExecuteSQL from '@/components/ExecuteSQL';
@@ -42,6 +43,7 @@ interface ITableProps {
   className?: string;
   outerQueryResultData: IManageResultData;
   executeSqlParams: any;
+  tableBoxId: string;
 }
 
 interface IViewTableCellData {
@@ -90,7 +92,7 @@ const defaultPaginationConfig: IResultConfig = {
 };
 
 export default function TableBox(props: ITableProps) {
-  const { className, outerQueryResultData } = props;
+  const { className, outerQueryResultData, tableBoxId } = props;
   const [viewTableCellData, setViewTableCellData] = useState<IViewTableCellData | null>(null);
   const [, contextHolder] = message.useMessage();
   const [paginationConfig, setPaginationConfig] = useState<IResultConfig>(defaultPaginationConfig);
@@ -141,6 +143,7 @@ export default function TableBox(props: ITableProps) {
       setFocusedContent: state.setFocusedContent,
     };
   });
+  const activeSearchResult = useWorkspaceStore((state) => state.activeTab.activeSearchResult);
 
   const handleExportSQLResult = async (exportType: ExportTypeEnum, exportSize: ExportSizeEnum) => {
     const params: IExportParams = {
@@ -1075,6 +1078,7 @@ export default function TableBox(props: ITableProps) {
               />
             </div>
             <div className={classnames(styles.toolBarItem, styles.refreshBar)}>
+              {/* 刷新 */}
               <Popover mouseEnterDelay={0.8} content={i18n('common.button.refresh')} trigger="hover">
                 <div
                   onClick={() => {
@@ -1208,7 +1212,7 @@ export default function TableBox(props: ITableProps) {
 
   return (
     <div className={classnames(className, styles.tableBox, { [styles.noDataTableBox]: !tableData.length })}>
-      {renderContent()}
+      {activeSearchResult.id === tableBoxId && renderContent()}
       <Modal
         title={viewTableCellData?.name}
         open={!!viewTableCellData?.name}
