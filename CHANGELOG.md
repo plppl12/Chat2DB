@@ -1,3 +1,35 @@
+## 3.0.14
+
+`2023-11-20`
+
+**Changelog**
+
+- 🐞【Fixed】Team paging problem
+- 🐞【Fixed】Oracle service name bug
+- 🐞【Fixed】Oracle datatype error
+- 🐞【Fixed】Fixed an issue where MySQL changed table structure without displaying comments.
+- ⚡️【Optimize】Support database or schema
+- 【Developer】Friends don't worry, the company has some things recently, and is preparing 3.1.0, be patient
+
+## 3.0.13
+
+`2023-11-15`
+
+**Changelog**
+
+- 🐞【Fixed】oracle datatype error
+- 🐞【Fixed】DM index error
+
+
+## 3.0.12
+
+`2023-11-13`
+
+**更新日志**
+
+- 🐞【Fixed】Copy as insert first row lost problem
+
+
 ## 3.0.11
 
 `2023-11-08`

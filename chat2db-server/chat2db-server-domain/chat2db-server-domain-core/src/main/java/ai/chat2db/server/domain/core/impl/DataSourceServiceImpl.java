@@ -35,6 +35,7 @@ import ai.chat2db.server.tools.common.util.ContextUtils;
 import ai.chat2db.server.tools.common.util.EasyCollectionUtils;
 import ai.chat2db.server.tools.common.util.EasyEnumUtils;
 import ai.chat2db.server.tools.common.util.EasySqlUtils;
+import ai.chat2db.spi.config.DBConfig;
 import ai.chat2db.spi.config.DriverConfig;
 import ai.chat2db.spi.model.DataSourceConnect;
 import ai.chat2db.spi.model.Database;
@@ -89,10 +90,13 @@ public class DataSourceServiceImpl implements DataSourceService {
         if (dataSourceKind == DataSourceKindEnum.SHARED && !ContextUtils.getLoginUser().getAdmin()) {
             throw new PermissionDeniedBusinessException();
         }
+        JdbcUtils.removePropertySameAsDefault(param.getDriverConfig());
         DataSourceDO dataSourceDO = dataSourceConverter.param2do(param);
         dataSourceDO.setGmtCreate(DateUtil.date());
         dataSourceDO.setGmtModified(DateUtil.date());
         dataSourceDO.setUserId(ContextUtils.getUserId());
+        dataSourceDO.setExtendInfo(null);
+
         dataSourceMapper.insert(dataSourceDO);
         preWarmingData(dataSourceDO.getId());
         return DataResult.of(dataSourceDO.getId());
@@ -125,6 +129,7 @@ public class DataSourceServiceImpl implements DataSourceService {
         DataSource dataSource = queryExistent(param.getId(), null).getData();
         PermissionUtils.checkOperationPermission(dataSource.getUserId());
 
+        JdbcUtils.removePropertySameAsDefault(param.getDriverConfig());
         DataSourceDO dataSourceDO = dataSourceConverter.param2do(param);
         dataSourceDO.setGmtModified(DateUtil.date());
         dataSourceMapper.updateById(dataSourceDO);
@@ -274,26 +279,26 @@ public class DataSourceServiceImpl implements DataSourceService {
 
         fillEnvironment(list, selector);
 
-        fillExtendInfo(list);
+        fillSupportDatabase(list);
     }
 
-    private void fillExtendInfo(List<DataSource> list) {
-        for (DataSource dataSource : list) {
-            List<KeyValue> keyValues = dataSource.getExtendInfo();
-            if (CollectionUtils.isEmpty(keyValues)) {
-                continue;
-            }
-            for (KeyValue keyValue : keyValues) {
-                if (keyValue != null) {
-                    if ("serviceName".equalsIgnoreCase(keyValue.getKey())) {
+    private void fillSupportDatabase(List<DataSource> list) {
 
-                    }
+        if(CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        for (DataSource dataSource:list) {
+            String type = dataSource.getType();
+            if(StringUtils.isNotBlank(type)) {
+                DBConfig config = Chat2DBContext.getDBConfig(type);
+                if(config != null) {
+                    dataSource.setSupportDatabase(config.isSupportDatabase());
+                    dataSource.setSupportSchema(config.isSupportSchema());
                 }
             }
-
         }
-
     }
+
 
     private void fillEnvironment(List<DataSource> list, DataSourceSelector selector) {
         if (BooleanUtils.isNotTrue(selector.getEnvironment())) {
