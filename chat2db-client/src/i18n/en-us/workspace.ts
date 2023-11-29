@@ -5,10 +5,15 @@ export default {
   'workspace.title.saved': 'Saved',
   'workspace.menu.ViewDDL': 'View DDL',
   'workspace.menu.deleteTable': 'Delete Table',
+  'workspace.menu.openTable': 'Open Table',
   'workspace.menu.editTable': 'Edit Table',
+  'workspace.menu.view': 'View',
   'workspace.menu.pin': 'Pin',
   'workspace.menu.unPin': 'Unpin',
   'workspace.menu.editTableData': 'Edit Table Data',
+  'workspace.menu.queryConsole': 'Query console',
+  'workspace.menu.createDatabase': 'Create database',
+  'workspace.menu.createSchema': 'Create schema',
   'workspace.menu.deleteTablePlaceHolder': 'Please enter the name of the table you want to delete',
   'workspace.tips.affirmDeleteTable':
     'The table name you entered is not the same as the table name you want to delete, please confirm again',
@@ -22,4 +27,7 @@ export default {
   'workspace.tree.trigger': 'Trigger',
   'workspace.tree.function': 'Function',
   'workspace.tree.procedure': 'Procedure',
+  'workspace.tree.search.placeholder': 'Search in the expand node',
+  'workspace.tree.delete.tip': 'I understand that this operation is permanently deleted',
+  'workspace.tree.delete.table.tip': 'Are you sure you want to delete the table {1}?',
 };
