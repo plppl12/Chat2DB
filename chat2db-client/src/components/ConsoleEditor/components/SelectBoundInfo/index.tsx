@@ -78,7 +78,7 @@ const SelectBoundInfo = memo((props: IProps) => {
       setSchemaList([]);
       getSchemaList();
     }
-  }, [boundInfo.dataSourceId]);
+  }, [boundInfo.dataSourceId, isActive]);
 
   // 当数据库名变化时，重新获取schema列表
   useEffect(() => {
@@ -91,7 +91,7 @@ const SelectBoundInfo = memo((props: IProps) => {
     if (!supportSchema && boundInfo.databaseName) {
       getAllTableNameList(boundInfo.dataSourceId, boundInfo.databaseName);
     }
-  }, [boundInfo.databaseName]);
+  }, [boundInfo.databaseName, isActive]);
 
   useEffect(() => {
     if (!isActive) {
@@ -100,7 +100,7 @@ const SelectBoundInfo = memo((props: IProps) => {
     if (supportSchema && boundInfo.schemaName) {
       getAllTableNameList(boundInfo.dataSourceId, boundInfo.databaseName, boundInfo.schemaName);
     }
-  }, [boundInfo.schemaName]);
+  }, [boundInfo.schemaName, isActive]);
 
   // 获取数据库列表
   const getDatabaseList = () => {
@@ -190,12 +190,14 @@ const SelectBoundInfo = memo((props: IProps) => {
       databaseName: void 0,
       schemaName: void 0,
     });
-    historyService.updateSavedConsole({
-      id: boundInfo.consoleId,
-      dataSourceId: currentData.value,
-      dataSourceName: currentData.label,
-      type: currentData.type,
-    });
+    if (boundInfo.consoleId) {
+      historyService.updateSavedConsole({
+        id: boundInfo.consoleId,
+        dataSourceId: currentData.value,
+        dataSourceName: currentData.label,
+        type: currentData.type,
+      });
+    }
   };
 
   // 选择数据库
@@ -208,10 +210,12 @@ const SelectBoundInfo = memo((props: IProps) => {
       schemaName: void 0,
     });
 
-    historyService.updateSavedConsole({
-      id: boundInfo.consoleId,
-      databaseName: _databaseName,
-    });
+    if (boundInfo.consoleId) {
+      historyService.updateSavedConsole({
+        id: boundInfo.consoleId,
+        databaseName: _databaseName,
+      });
+    }
   };
 
   // 选择schema
@@ -222,10 +226,12 @@ const SelectBoundInfo = memo((props: IProps) => {
       schemaName: _schemaName,
     });
 
-    historyService.updateSavedConsole({
-      id: boundInfo.consoleId,
-      schemaName: _schemaName,
-    });
+    if (boundInfo.consoleId) {
+      historyService.updateSavedConsole({
+        id: boundInfo.consoleId,
+        schemaName: _schemaName,
+      });
+    }
   };
 
   const getAllTableNameList = (dataSourceId, databaseName, schemaName?) => {
