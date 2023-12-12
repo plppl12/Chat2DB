@@ -36,8 +36,6 @@ import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -45,6 +43,9 @@ import java.util.jar.JarFile;
 public class Dbutils {
 
     private static final ThreadLocal<SqlSession> SQL_SESSION_THREAD_LOCAL = new ThreadLocal<>();
+
+    public static void init() {
+    }
 
     public static void setSession() {
         SqlSession session = sqlSessionFactory.openSession(true);
@@ -145,7 +146,9 @@ public class Dbutils {
         String environment = StringUtils.defaultString(System.getProperty("spring.profiles.active"), "dev");
         if ("dev".equalsIgnoreCase(environment)) {
             dataSource.setJdbcUrl("jdbc:h2:file:~/.chat2db/db/chat2db_dev;MODE=MYSQL");
-        } else {
+        }else if ("test".equalsIgnoreCase(environment)) {
+            dataSource.setJdbcUrl("jdbc:h2:file:~/.chat2db/db/chat2db_test;MODE=MYSQL");
+        }else {
             dataSource.setJdbcUrl("jdbc:h2:~/.chat2db/db/chat2db;MODE=MYSQL;FILE_LOCK=NO");
         }
         dataSource.setDriverClassName("org.h2.Driver");
