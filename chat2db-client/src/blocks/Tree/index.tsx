@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useState, createContext, useContext, useRef } from 'react';
+import React, { memo, useEffect, useMemo, useState, createContext, useContext } from 'react';
 import styles from './index.less';
 import classnames from 'classnames';
 import Iconfont from '@/components/Iconfont';
@@ -48,6 +48,40 @@ const smoothTree = (treeData: ITreeNode[], result: ITreeNode[] = [], parentNode?
   return result;
 };
 
+// 判断是否匹配
+const isMatch = (target: string, searchValue: string) => {
+  const reg = new RegExp(searchValue, 'i');
+  return reg.test(target || '');
+};
+
+// 树结构搜索
+function searchTree(treeData: ITreeNode[], searchValue: string): ITreeNode[] {
+  let result: ITreeNode[] = [];
+  function dfs(node: ITreeNode, path: ITreeNode[] = []) {
+    if (isMatch(node.name, searchValue)) {
+      result = [...result,...path, node];
+      return true;
+    }
+    if (!node.children) return false;
+    for (const child of node.children) {
+      if (dfs(child, [...path, node])) return true;
+    }
+    return false;
+  }
+
+  treeData.forEach((node) => dfs(node));
+
+  result.forEach((item) => {
+    if(!isMatch(item.name, searchValue)){
+      item.children = null;
+    }
+  });
+
+  const smoothTreeList: ITreeNode[] = []
+  smoothTree(result, smoothTreeList);
+  return smoothTreeList;
+}
+
 const itemHeight = 26; // 每个 item 的高度
 const paddingCount = 2;
 
@@ -89,17 +123,14 @@ const Tree = (props: IProps) => {
   }, [smoothTreeData, searchTreeData, startIdx]);
 
   useEffect(() => {
-    if (searchValue) {
-      const ls = smoothTreeData.filter((item) => {
-        const reg = new RegExp(searchValue, 'i');
-        return reg.test(item.name || '');
-      });
-      setSearchTreeData(ls);
+    if (searchValue && treeData) {
+      const _searchTreeData = searchTree(cloneDeep(treeData), searchValue)
+      setSearchTreeData(_searchTreeData);
     } else {
       setSearchTreeData(null);
     }
     setScrollTop(0);
-  }, [searchValue]);
+  }, [searchValue, smoothTreeData,treeData]);
 
   return (
     <LoadingContent isLoading={!treeData} className={classnames(className)}>
@@ -107,7 +138,6 @@ const Tree = (props: IProps) => {
         <div
           className={classnames(styles.scrollBox)}
           onScroll={(e: any) => {
-            console.log(e.target.scrollTop);
             setScrollTop(e.target.scrollTop);
           }}
         >
