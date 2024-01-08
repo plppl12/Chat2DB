@@ -96,8 +96,8 @@
     "asar": false,
     "files": [
       "dist/**/*",
-      "src/main/preload.js",
-      "src/main/main.js",
+      "src/main",
+      "static/",
       "versions/**/*",
       "package.json",
       "!node_modules/**/*"
