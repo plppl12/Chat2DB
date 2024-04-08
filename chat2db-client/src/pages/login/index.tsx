@@ -8,7 +8,7 @@ import Iconfont from '@/components/Iconfont';
 import i18n from '@/i18n';
 // import { useNavigate } from 'react-router-dom';
 import { logoutClearSomeLocalStorage, navigate } from '@/utils';
-import { queryCurUser } from '@/store/user'
+import { queryCurUser } from '@/store/user';
 
 interface IFormData {
   userName: string;
