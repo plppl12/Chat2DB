@@ -14,11 +14,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
+
 @Slf4j
 public class MysqlDBManage extends DefaultDBManage implements DBManage {
     @Override
     public void exportDatabase(Connection connection, String databaseName, String schemaName, AsyncContext asyncContext) throws SQLException {
-        asyncContext.write(String.format(EXPORT_TITLE, DateUtil.formatDate(new Date())));
+        asyncContext.write(String.format(EXPORT_TITLE, DateUtil.format(new Date(),NORM_DATETIME_PATTERN)));
         exportTables(connection, databaseName, schemaName, asyncContext);
         asyncContext.setProgress(50);
         exportViews(connection, databaseName, asyncContext);
@@ -54,7 +56,7 @@ public class MysqlDBManage extends DefaultDBManage implements DBManage {
     }
 
     private void exportTables(Connection connection, String databaseName, String schemaName, AsyncContext asyncContext) throws SQLException {
-        asyncContext.write("SET FOREIGN_KEY_CHECKS=0;\n");
+        asyncContext.write("SET FOREIGN_KEY_CHECKS=0;");
         try (ResultSet resultSet = connection.getMetaData().getTables(databaseName, null, null, new String[]{"TABLE", "SYSTEM TABLE"})) {
             while (resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
@@ -70,18 +72,17 @@ public class MysqlDBManage extends DefaultDBManage implements DBManage {
         try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
             if (resultSet.next()) {
                 StringBuilder sqlBuilder = new StringBuilder();
-                asyncContext.write(String.format(EXPORT_TITLE, tableName));
+                asyncContext.write(String.format(TABLE_TITLE, tableName));
                 sqlBuilder.append("DROP TABLE IF EXISTS ").append(format(tableName)).append(";").append("\n")
                         .append(resultSet.getString("Create Table")).append(";").append("\n");
                 asyncContext.write(sqlBuilder.toString());
-                asyncContext.write("\n");
                 if (asyncContext.isContainsData()) {
                     exportTableData(connection, databaseName, schemaName, tableName, asyncContext);
                 }
             }
         }catch (Exception e){
             log.error("export table error", e);
-            asyncContext.getCall().error(String.format("export table %s error:%s", tableName,e.getMessage()));
+            asyncContext.error(String.format("export table %s error:%s", tableName,e.getMessage()));
         }
     }
 
