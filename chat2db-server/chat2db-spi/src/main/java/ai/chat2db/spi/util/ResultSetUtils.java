@@ -1,8 +1,6 @@
 
 package ai.chat2db.spi.util;
 
-import ai.chat2db.server.tools.common.util.I18nUtils;
-import cn.hutool.core.io.unit.DataSizeUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +25,6 @@ import java.util.Map;
  */
 @Slf4j
 public class ResultSetUtils {
-
 
 
     public static List<String> getRsHeader(ResultSet rs) {
@@ -118,7 +115,9 @@ public class ResultSetUtils {
             if (obj == null) {
                 return null;
             }
-            if (obj instanceof BigDecimal bigDecimal) {
+            if(obj instanceof String){
+                return (String) obj;
+            }else if (obj instanceof BigDecimal bigDecimal) {
                 return bigDecimal.toPlainString();
             } else if (obj instanceof Double d) {
                 return BigDecimal.valueOf(d).toPlainString();
@@ -258,6 +257,14 @@ public class ResultSetUtils {
     public static BigDecimal getBigDecimal(ResultSet resultSet, int columnIndex) {
         try {
             return resultSet.getBigDecimal(columnIndex);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getStringValue(ResultSet resultSet, int columnIndex) {
+        try {
+            return resultSet.getString(columnIndex);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

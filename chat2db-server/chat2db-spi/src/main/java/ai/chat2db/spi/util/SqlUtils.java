@@ -12,7 +12,6 @@ import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
-import com.google.common.collect.Lists;
 import com.oceanbase.tools.sqlparser.oracle.PlSqlLexer;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Function;
@@ -294,7 +293,7 @@ public class SqlUtils {
         String bufferStr = buffer.toString();
         if (bufferStr.trim().length() != 0) {
             // if buffer is not empty, there will be some errors in syntax
-            log.info("sql processor's buffer is not empty, there may be some errors. buffer={}", bufferStr);
+//            log.info("sql processor's buffer is not empty, there may be some errors. buffer={}", bufferStr);
             int lastSqlOffset;
             if (sqls.size() == 0) {
                 int index = sql.indexOf(bufferStr.trim(), 0);
@@ -315,5 +314,32 @@ public class SqlUtils {
     public static void main(String[] args) {
 
     }
+
+    public static String quoteObjectName(String name) {
+        return quoteObjectName(name, "\"");
+    }
+
+    public static String quoteObjectName(String name, String quoteSymbol) {
+        if (StringUtils.isNotBlank(name)) {
+            boolean startsWithQuote = name.startsWith(quoteSymbol);
+            boolean endsWithQuote = name.endsWith(quoteSymbol);
+
+            if (!startsWithQuote && !endsWithQuote) {
+                // 如果前后都没有quoteSymbol
+                return quoteSymbol + name + quoteSymbol;
+            } else if (startsWithQuote && !endsWithQuote) {
+                // 如果只有前面有quoteSymbol
+                return quoteSymbol + quoteSymbol + name + quoteSymbol;
+            } else if (!startsWithQuote) {
+                // 如果只有后面有quoteSymbol
+                return quoteSymbol + name + quoteSymbol + quoteSymbol;
+            }
+            // 如果前后都有quoteSymbol，直接返回原字符串
+            return name;
+        }
+        // 如果name为空或仅包含空白字符，返回原字符串
+        return name;
+    }
+
 
 }
