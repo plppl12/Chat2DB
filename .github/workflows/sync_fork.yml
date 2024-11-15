@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: sync_main
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -17,7 +17,7 @@ jobs:
           retries: 3
           retry_after: 10
       - name: sync_dev
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -26,7 +26,7 @@ jobs:
           retries: 3
           retry_after: 10
       - name: sync_release_test
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -35,7 +35,7 @@ jobs:
           retries: 3
           retry_after: 10
       - name: sync_release_test_2
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -44,7 +44,7 @@ jobs:
           retries: 3
           retry_after: 10
       - name: sync_developing
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -53,7 +53,7 @@ jobs:
           retries: 3
           retry_after: 10          
       - name: sync_ai-chat
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -62,7 +62,7 @@ jobs:
           retries: 3
           retry_after: 10
       - name: sync_export_ddl
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -71,7 +71,7 @@ jobs:
           retries: 3
           retry_after: 10
       - name: sync_database-table-editor
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
@@ -80,7 +80,7 @@ jobs:
           retries: 3
           retry_after: 10
       - name: sync_team
-        uses: tgymnich/fork-sync@v1.9.0
+        uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
           owner: chat2db
