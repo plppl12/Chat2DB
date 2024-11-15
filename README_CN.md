@@ -1,6 +1,5 @@
 
-
-<a><img src="https://github.com/user-attachments/assets/8d0b3575-d38f-43a2-9d43-11d6475da0c7" width="30%"/></a>
+<a><img src="https://github.com/user-attachments/assets/cdb1f367-bd8e-47af-be31-d8269a3c6a31" width="20%"/></a>
 <a><img src="https://github.com/chat2db/Chat2DB/assets/22975773/81d13eff-c615-49f5-aee3-4107089593e0" width="20%"/></a>
 
 加群前请先 Star 和 Fork，谢谢~关注微信公众号可加入微信、钉钉、QQ 群一起讨论，并可以获取 Chat2DB 最新动态和更新。
@@ -72,6 +71,7 @@
 - modelscope：[Chat2DB-SQL-7B](https://modelscope.cn/models/Chat2DB/Chat2DB-SQL-7B/summary)
 
 ### 在Chat2DB上即成InternLM模型
+
 感谢InternLM对本项目的大力支持，在本项目中的自定义模型中，可以集成InternLM的多个模型权重，具体请参考[chat2db-internlm-deploy](https://github.com/chat2db/chat2db-internlm-deploy)
 
 ## 支持的数据库
